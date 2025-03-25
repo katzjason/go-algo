@@ -212,7 +212,6 @@ class Board:
 
 
   def get_score(self):
-    # TODO prisoners?
     territories_map = self._calculate_territories(False)
     if self.player == 1:
       return territories_map["Black"] + self._blacks_prisoners
