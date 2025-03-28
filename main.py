@@ -399,7 +399,7 @@ def predict():
     return jsonify({"move": ai_move_str}), 200
   
   except Exception as e:
-    return jsonify({"error!: ": str(e)}), 500
+    return jsonify({"error!: ": str(e)}), 500 
 
 if __name__ == "__main__":
   #  app.run(debug=True)
