@@ -21,16 +21,6 @@ class Board:
     self._ko = None
     self._ko_player = None
     self._board = np.zeros((rows, cols))
-    #self._board = [[-1,-1,-1,-1,-1,-1,-1,-1,-1],
-                  #  [-1,-1,-1,-1,-1, 0,-1,-1,-1],
-                  #  [-1,-1,-1,-1,-1,-1,-1,-1,-1],
-                  #  [ 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                  #  [ 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                  #  [ 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                  #  [ 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                  #  [ 1, 1, 1, 1, 1, 1, 1, 0, 0],
-                  #  [ 1, 1, 1, 1, 1, 1, 1, 0, 0]
-                  # ]
 
   def get_board(self):
     return self._board
@@ -376,18 +366,21 @@ app = Flask(__name__)
 def predict():
   try:
     payload = request.get_json() # dict representing the json
+    print(payload)
     board = np.array(payload["board"])
-    player = payload["player"]
-    ko = None if payload["ko"] == "" else (payload["ko"].split(",")[0], payload["ko"].split(",")[1])
-    ko_player = None if payload["koPlayer"] == 0 else payload["koPlayer"]
+    player = payload["move_player"]
+    ko = None if int(payload["ko_x"]) > 8 else (payload["ko_x"], payload["ko_y"])
+    ko_player = None if payload["ko_player_restriction"] == 0 else payload["ko_player_restriction"]
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    last_white_move = None if payload["lastWhiteMove"] == "" else (payload["lastWhiteMove"].split(",")[0], payload["lastWhiteMove"].split(",")[1])
-    last_black_move = None if payload["lastBlackMove"] == "" else (payload["lastBlackMove"].split(",")[0], payload["lastBlackMove"].split(",")[1])
+    # LAST MOVES
+    last_white_move = (payload["last_white_move"].split(",")[0],payload["last_white_move"].split(",")[1]) if "," in payload["last_white_move"] else "pass"
+    last_black_move = (payload["last_black_move"].split(",")[0],payload["last_black_move"].split(",")[1]) if "," in payload["last_black_move"] else "pass"
     model = PolicyNetwork1().to(device)
     model.load_state_dict(torch.load('policy_net_percentfilled.pth', map_location=torch.device("cpu")))
     model.eval()
     board_obj = Board(9,9)
+    # BOARD
     board_obj._board = board
     board_obj.player = int(player)
     board_obj._last_black_move = last_black_move
@@ -407,5 +400,5 @@ def predict():
     return jsonify({"error!: ": str(e)}), 500
 
 if __name__ == "__main__":
-  # app.run(debug=True)
-  app.run(host="0.0.0.0", port=5000)
+   app.run(debug=True)
+  # app.run(host="0.0.0.0", port=5000)
