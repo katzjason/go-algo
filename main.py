@@ -5,6 +5,7 @@ import torch.optim as optim
 import numpy as np
 from flask import jsonify, request, Flask
 import json
+from flask_cors import CORS
 
 
 
@@ -361,6 +362,7 @@ class PolicyNetwork1(nn.Module):
 ############
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/predict', methods=['POST'])
 def predict():
