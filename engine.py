@@ -312,7 +312,6 @@ def board_to_tensor(board_instance):
                 tensor[1][r][c] = 1  # opponent stones
             elif board[r][c] == 0:
                 tensor[2][r][c] = 1  # empty positions
-                
     # Channels 3-4 are for Ko     
     if ko:
         ko_r, ko_c = ko
@@ -327,17 +326,15 @@ def board_to_tensor(board_instance):
         tensor[5][:, :] = 1  # 1 for black
     else:
         tensor[5][:, :] = 0  # 0 for white
-    
     # Channel 6-7 is for last black/white moves
     tensor[6][:, :] = 0
     tensor[7][:, :] = 0
     if last_black_move:
         r, c = last_black_move
         tensor[6][r][c] = 1
-    if last_white_move:
+    if last_white_move and last_white_move != "pass":
         r, c = last_white_move
         tensor[7][r][c] = 1
-    
     # Channel 8 is for tracking when pieces were placed
     tensor[8] = turn_board
     
